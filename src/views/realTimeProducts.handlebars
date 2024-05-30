@@ -1,0 +1,113 @@
+<h1>Lista de productos</h1>
+<div class="conteiner">
+    {{#each data}}
+        <div style="width: 300px; background-color: #68a35dda;" id={{id}}>
+            <h4>Nombre: {{title}}</h4>
+            <h6>Id: {{id}}</h6>
+            <h5>Precio: {{price}}</h5>
+            <p>Description: {{description}}</p>
+        </div>
+    {{/each}}
+</div>
+<br>
+<h1>Crear un nuevo producto</h1>
+<form action="/realtimeproducts" method="post" id="add">
+    <input type="text" name="title" id="title" placeholder="Title">
+    <input type="text" name="code" id="code" placeholder="code">
+    <input type="text" name="description" id="description" placeholder="Description">
+    <input type="number" name="price" id="price" placeholder="price">
+    <input type="text" name="thumbnail" id="thumbnail" placeholder="thumbnail">
+    <input type="number" name="stock" id="stock" placeholder="stock">
+    <input type="text" name="category" id="category" placeholder="category">
+    <input type="submit" value="Añadir">
+</form>
+<h2>Eliminar producto</h2>
+<form id="delete">
+    <input type="text" id="idProducto" placeholder="ingrede el id del producto">
+    <input type="submit" value="Eliminar">
+</form>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socketClient = io();
+    const labels = ['title', 'code', 'description', 'price', 'thumbnail', 'stock', 'category'];
+    let product = {}
+    let add = document.getElementById('add');
+    let deleteProduct = document.getElementById("delete");
+
+
+    //El evento de addProduct
+    add.addEventListener('submit', (event)=> {
+        event.preventDefault();
+        
+        labels.forEach(label=>{
+            product = { ...product, [label]: document.getElementById(`${label}`).value }
+        });
+
+        let body = {
+            type: "add",
+            content: product
+        }
+        let options = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        }
+        fetch('/realtimeproducts', options);
+
+        add.reset(); 
+    })
+
+
+    //El evento de deleteProduct
+
+    deleteProduct.addEventListener('submit', (event)=>{
+        event.preventDefault();
+
+        const id = document.getElementById('idProducto').value;
+
+        let body = {
+            type: 'delete',
+            content: id
+        }
+        let options = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        }
+        fetch('/realtimeproducts', options);
+
+        deleteProduct.reset();
+    });
+
+    //Espera la emisión de addedProduct
+
+    socketClient.on('added', id=>{
+        const contenedor = document.querySelector('.conteiner');
+        const div = document.createElement('div');
+        const {title, price, description} = product;
+
+        div.innerHTML = `
+            <h4>Nombre: ${title}</h4>
+            <h6>Id: ${id}</h6>
+            <h5>Precio: ${price}</h5>
+            <p>Description: ${description}</p>
+        `;
+
+        div.setAttribute('style', 'width: 300px; background-color: #68a35dda;')
+        div.setAttribute('id', `${id}`)
+        contenedor.append(div);
+    });
+
+    //Espera la emisión de deletedProduct
+
+    socketClient.on('deleted', id=>{
+
+        let cont = document.querySelector('.conteiner');
+        let div = document.getElementById(`${id}`)
+        console.log(cont)
+        console.log(div)
+        cont.removeChild(div);
+
+    })
+
+</script>
