@@ -4,9 +4,10 @@ class MDBCartManager {
         this.model = model
     };
 
-    createCart( id ){
+    createCart = async() => {
+        let carts = await this.model.collection.countDocuments();
         const newCart = {
-            id: id,
+            id: carts + 1,
             products: []
         }
         this.model.create(newCart);

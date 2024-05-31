@@ -6,7 +6,7 @@ const router = Router();
 const cartManager = new CartManager(cartModel);
 
 router.post('/', async ( req, res )=>{
-    await cartManager.CreateCart();
+    await cartManager.createCart();
     res.status(200).send('Has creado un carrito')
 });
 
