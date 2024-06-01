@@ -7,7 +7,7 @@ const cartManager = new CartManager(cartModel);
 
 router.post('/', async ( req, res )=>{
     await cartManager.createCart();
-    res.status(200).send('Has creado un carrito')
+    res.status(200).send(`Has creado un carrito`)
 });
 
 router.get('/:cid', async ( req, res )=>{
