@@ -1,0 +1,80 @@
+<div>
+    <h1>CODER Chat</h1>
+    <h2>Ejemplo de cliente Socket.IO</h2>
+
+    <div>
+        <input type="text" id="chat" name="chat" placeholder="Ingresar mensaje" style="width: 300px;">
+        <br />
+        <button onClick="sendMessage()">Enviar</button>
+    </div>
+    <div id="chatList">
+        {{#each data}}
+            <br>
+            <p>[{{user}}]: {{message}}</p>
+        {{/each}}
+    </div>
+</div>
+
+
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.all.min.js"></script>
+<script>
+
+    const socketClient = io();  
+    const chat = document.getElementById('chat');
+    const chatList = document.getElementById('chatList');
+
+    let user;
+
+    socketClient.on('newMessageConfirmation', data => {
+        chatList.innerHTML += `<br/>` 
+        chatList.innerHTML += `<p>[${data.user}]: ${data.message}</p>` 
+    });
+
+    const sendMessage = () => {
+        if (chat.value !== '') {
+
+            let url = `/chat/`
+            
+            let body = {
+            user: user,
+            message: chat.value
+            }
+
+            let options = {
+                method: 'Post',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            }
+
+            fetch(url, options);
+
+            chat.value = '';
+
+
+            socketClient.emit('newMessage', {user: user, data: chat.value});
+        }
+    }
+
+    const askForUser = ()=>{
+        const result = Swal.fire({
+        title: 'Coderhouse',
+        input: 'text',
+        text: 'Usuario',
+        inputValidator: value => { return !value && 'Se debe indicar usuario' },
+        allowOutsideClick: false
+        }).then (result=>{
+        
+        user = result.value;
+        console.log(user)
+
+        socketClient.emit()
+            
+        })
+    }
+
+    askForUser();
+    
+</script>

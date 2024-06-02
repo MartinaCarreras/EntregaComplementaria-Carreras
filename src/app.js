@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import ViewsRoutes from './routes/views.routes.js';
 import ProductRoutes from './routes/products.routes.js';
 import CartRoutes from './routes/carts.routes.js';
+import ChatRoutes from './routes/chat.routes.js';
 import { config } from './config.js';
 import mongoose from 'mongoose';
 
@@ -20,6 +21,7 @@ app.set('view engine', 'handlebars');
 app.use('', ViewsRoutes)
 app.use('/api/products', ProductRoutes);
 app.use('/api/carts', CartRoutes);
+app.use('/chat', ChatRoutes);
 app.use(express.static(`${config.DIRNAME}/public`));
 
 
